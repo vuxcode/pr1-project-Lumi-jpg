@@ -1,0 +1,242 @@
+<meta name="color-scheme" content="dark">
+<!-- ADDING CANVAS-->
+<canvas id="canvas" width="540" height="540"></canvas>
+<button id="walkUp"></button>
+<button id="walkDown"></button>
+<button id="walkLeft"></button>
+<button id="walkRight"></button>
+
+<script>
+
+//canvas STUFF
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext("2d");
+//variables used throughout
+var maploop = 0
+var x = 0
+var y = 0
+var playerHP = 10
+var playerDMG = 2
+//Buttons
+var buttonUp = document.getElementById("buttonUp")
+var buttonDown = document.getElementById("buttonDown")
+var buttonLeft = document.getElementById("buttonLeft")
+var buttonRight = document.getElementById("buttonRight")
+//adding eventlisteners to the buttons for when "wasd" is pressed 
+buttonUp.addEventListener("click", goUp)
+buttonDown.addEventListener("click", goDown)
+buttonLeft.addEventListener("click", goLeft)
+buttonRight.addEventListener("click", goRight)
+
+//Open
+//#region
+var piece00 = [
+      [true, true, true, true, true],
+      [true, true, true, true, true],
+      [true, true, true, true, true],
+      [true, true, true, true, true],
+      [true, true, true, true, true],
+]
+//plus shaped
+var piece01 = [
+      [false, false, true, false, false],
+      [false, false, true, false, false],
+      [true, true, true, true, true],
+      [false, false, true, false, false],
+      [false, false, true, false, false],
+]
+//column
+var piece02 = [
+      [false, false, true, false, false],
+      [false, false, true, false, false],
+      [false, false, true, false, false],
+      [false, false, true, false, false],
+      [false, false, true, false, false],
+]
+//line
+var piece03 = [
+      [false, false, false, false, false],
+      [false, false, false, false, false],
+      [true, true, true, true, true],
+      [false, false, false, false, false],
+      [false, false, false, false, false],
+]
+//Big O shape
+var piece04 = [
+      [true, true, true, true, true],
+      [true, false, false, false, true],
+      [true, false, false, false, true],
+      [true, false, false, false, true],
+      [true, true, true, true, true],
+]
+// little O shape v1
+var piece05 = [
+      [false, false, true, false, false],
+      [false, true, true, true, false],
+      [true, true, false, true, true],
+      [false, true, true, true, false],
+      [false, false, true, false, false],
+]
+//little O shape v2
+var piece06 = [
+[false, false, true, false, false],
+      [false, true, true, true, false],
+      [true, true, true, true, true],
+      [false, true, true, true, false],
+      [false, false, true, false, false],
+]
+//corner line NORTH - EAST
+var piece07 = [
+      [false, false, true, true, true],
+      [false, false, false, false, true],
+      [false, false, false, false, true],
+      [false, false, false, false, false],
+      [false, false, false, false, false],
+]
+//corner line EAST - SOUTH
+var piece08 = [
+      [false, false, false, false, false],
+      [false, false, false, false, false],
+      [false, false, false, false, true],
+      [false, false, false, false, true],
+      [false, false, true, true, true],
+]
+//corner line SOUTH - WEST
+var piece09 = [
+      [false, false, false, false, false],
+      [false, false, false, false, false],
+      [true, false, false, false, false],
+      [true, false, false, false, false],
+      [true, true, true, false, false],
+]
+//corner line WEST - NORTH
+var piece10 = [
+      [true, true, true, false, false],
+      [true, false, false, false, false],
+      [true, false, false, false, false],
+      [false, false, false, false, false],
+      [false, false, false, false, false],
+]
+//corner line NORTH - South (east)
+var piece11 = [
+      [false, false, true, true, true],
+      [false, false, false, false, true],
+      [false, false, false, false, true],
+      [false, false, false, false, true],
+      [false, false, true, true, true],
+]
+//corner line NORTH - SOUTH (west)
+var piece12 = [
+      [true, true, true, false, false],
+      [true, false, false, false, false],
+      [true, false, false, false, false],
+      [true, false, false, false, false],
+      [true, true, true, false, false],
+]
+//corner line EAST - WEST (north)
+var piece13 = [
+      [true, true, true, true, true],
+      [true, false, false, false, true],
+      [true, false, false, false, true],
+      [false, false, false, false, false],
+      [false, false, false, false, false],
+]
+//corner line EAST - WEST (south)
+var piece14 = [
+      [false, false, false, false, false],
+      [false, false, false, false, false],
+      [true, false, false, false, true],
+      [true, false, false, false, true],
+      [true, true, true, true, true],
+]
+//#endregion
+
+//adding all pieces into an array
+var mapTiles = [piece00, piece01, piece02, piece03, piece04, piece05, piece06, piece07, piece08, piece09, piece10, piece11, piece12, piece13, piece14]
+//making the "map" for the pieces to be nested in
+var map = [
+      [], [], [], [], [], 
+      [], [], [], [], [],
+      [], [], [], [], [],
+      [], [], [], [], [],
+      [], [], [], [], [],
+]
+
+function fillMap () {
+for(maploop; maploop < 25; maploop++) {
+    //making a random number generator using the length of the map array
+    var mapTilesRandom = Math.random()
+    var mapTilesLength = mapTiles.length
+    var mapTilesOutput = Math.floor(mapTilesRandom*mapTilesLength)
+    //pushing "map pieces" into the map variable making it a nested array inside a nested array
+    var randomTile = mapTiles[mapTilesOutput]
+    map[maploop].push(randomTile)
+}
+}
+fillMap();
+//checking that canvas works
+ctx.fillStyle = "white";
+ctx.fillRect(20, 20, 20, 20);
+
+var mapColors = ["white", "blue"]
+
+//Checking so the nesting works as inteded (!So far works outside of function below!)
+var ab = 0
+var abc = 1
+var abcd = 2
+var abcdef = 4
+console.log(map[abc][ab][abcd][abcdef])
+
+//remember map[][][][] to reach true/false state
+//map[which array of the map from 0-24]
+//map[][only one option, 0(only one option in my case)]
+//map[][][checking the arrays inside the maptile]
+//map[][][][checking values within said array(true/false)]
+
+//Making a function to draw the map using canvas
+function drawMap () {
+    //making a forloop that counts to 25 for the size of the map
+    // making map[X][][][] possible
+    for (var xyz=0;xyz=map.length;xyz++) { 
+        //making a loop to run within the first forloop to run map[][][X][]
+        for (y=0;y<=map[1][0].length;y++) {
+            //making yet another forloop to run map[][][][X]
+            for (x=0;x<=map[1][0].length;x++) {
+                //Cannot read properties of undefined (reading '0') because of [0] OR any "nesting" beyond the first !!MAIN PROBLEM!!
+                if(map[xyz][0][y][x] == false) {
+                    //coloring walls blue temporarily to resemble water
+                    ctx.fillStyle = "blue";
+                    ctx.fillRect(20*x*xyz, 20*y*xyz, 20, 20)
+                    //coloring non-walls green temporarily to resemble grass
+                }   else {
+                        ctx.fillStyle = "green"
+                        ctx.fillRect(20*xyz, 20*xyz, 20, 20)
+                    }
+            } 
+        }
+    }
+}
+drawMap();
+ctx.fillRect()
+
+//making a function for the playable character
+function player() {
+
+}
+
+
+function goUp(){
+// along the lines of "if" map[][][][] "above" player == true... pop player... push player (to new tile)
+}
+function goDown(){
+//-||- "below"
+}
+function goLeft(){
+//-||- "to the left"
+}
+function goRight(){
+//-||- "to the right"
+}
+
+
+</script>

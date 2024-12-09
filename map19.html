@@ -1,0 +1,190 @@
+<meta name="color-scheme" content="dark">
+<!-- ADDING CANVAS-->
+<canvas id="canvas" width="500" height="800"></canvas>
+
+<script>
+
+var isZero = 0
+
+
+//Open
+//#region
+var piece00 = [
+      [true, true, true, true, true],
+      [true, true, true, true, true],
+      [true, true, true, true, true],
+      [true, true, true, true, true],
+      [true, true, true, true, true],
+]
+//plus shaped
+var piece01 = [
+      [false, false, true, false, false],
+      [false, false, true, false, false],
+      [true, true, true, true, true],
+      [false, false, true, false, false],
+      [false, false, true, false, false],
+]
+//column
+var piece02 = [
+      [false, false, true, false, false],
+      [false, false, true, false, false],
+      [false, false, true, false, false],
+      [false, false, true, false, false],
+      [false, false, true, false, false],
+]
+//line
+var piece03 = [
+      [false, false, false, false, false],
+      [false, false, false, false, false],
+      [true, true, true, true, true],
+      [false, false, false, false, false],
+      [false, false, false, false, false],
+]
+//Big O shape
+var piece04 = [
+      [true, true, true, true, true],
+      [true, false, false, false, true],
+      [true, false, false, false, true],
+      [true, false, false, false, true],
+      [true, true, true, true, true],
+]
+// little O shape v1
+var piece05 = [
+      [false, false, true, false, false],
+      [false, true, true, true, false],
+      [true, true, false, true, true],
+      [false, true, true, true, false],
+      [false, false, true, false, false],
+]
+//little O shape v2
+var piece06 = [
+[false, false, true, false, false],
+      [false, true, true, true, false],
+      [true, true, true, true, true],
+      [false, true, true, true, false],
+      [false, false, true, false, false],
+]
+//corner line NORTH - EAST
+var piece07 = [
+      [false, false, true, true, true],
+      [false, false, false, false, true],
+      [false, false, false, false, true],
+      [false, false, false, false, false],
+      [false, false, false, false, false],
+]
+//corner line EAST - SOUTH
+var piece08 = [
+      [false, false, false, false, false],
+      [false, false, false, false, false],
+      [false, false, false, false, true],
+      [false, false, false, false, true],
+      [false, false, true, true, true],
+]
+//corner line SOUTH - WEST
+var piece09 = [
+      [false, false, false, false, false],
+      [false, false, false, false, false],
+      [true, false, false, false, false],
+      [true, false, false, false, false],
+      [true, true, true, false, false],
+]
+//corner line WEST - NORTH
+var piece10 = [
+      [true, true, true, false, false],
+      [true, false, false, false, false],
+      [true, false, false, false, false],
+      [false, false, false, false, false],
+      [false, false, false, false, false],
+]
+//corner line NORTH - South (east)
+var piece11 = [
+      [false, false, true, true, true],
+      [false, false, false, false, true],
+      [false, false, false, false, true],
+      [false, false, false, false, true],
+      [false, false, true, true, true],
+]
+//corner line NORTH - SOUTH (west)
+var piece12 = [
+      [true, true, true, false, false],
+      [true, false, false, false, false],
+      [true, false, false, false, false],
+      [true, false, false, false, false],
+      [true, true, true, false, false],
+]
+//corner line EAST - WEST (north)
+var piece13 = [
+      [true, true, true, true, true],
+      [true, false, false, false, true],
+      [true, false, false, false, true],
+      [false, false, false, false, false],
+      [false, false, false, false, false],
+]
+//corner line EAST - WEST (south)
+var piece14 = [
+      [false, false, false, false, false],
+      [false, false, false, false, false],
+      [true, false, false, false, true],
+      [true, false, false, false, true],
+      [true, true, true, true, true],
+]
+//#endregion
+
+//adding all pieces into an array
+var mapTiles = [piece00, piece01, piece02, piece03, piece04, piece05, piece06, piece07, piece08, piece09, piece10, piece11, piece12, piece13, piece14]
+
+var map = [
+      [], [], [], [], [], 
+      [], [], [], [], [],
+      [], [], [], [], [],
+      [], [], [], [], [],
+      [], [], [], [], [],
+]
+
+var maploop = 0
+function fillMap () {
+for(maploop; maploop < 25; maploop++) {
+    //making a random number generator using the length of the map array
+    var mapTilesRandom = Math.random()
+    var mapTilesLength = mapTiles.length
+    var mapTilesOutput = Math.floor(mapTilesRandom*mapTilesLength)
+    var randomTile = mapTiles[mapTilesOutput]
+    map[maploop].push(randomTile)
+}
+}
+fillMap();
+
+
+//canvas STUFF
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext("2d");
+
+ctx.fillStyle = "white";
+ctx.fillRect(20, 20, 20, 20);
+
+var mapColors = ["white", "blue"]
+
+
+// FIX THE INFINITE LOOP ASAP!!!!
+// also remember map[] [] [] []!
+
+function drawMap () {
+for (var piecePart = 0; piecePart = map.length; piecePart++) { 
+    for (var xPart = 0; xPart = 4; xPart++) {
+        for (var yPart = 0; yPart = 4; yPart++) {
+            if(map[piecePart][0][xPart][yPart] == false) {
+                ctx.fillStyle = "blue";
+                ctx.fillRect(20*piecePart, 20*piecePart, 20, 20)
+            } else {
+                ctx.fillStyle = "green"
+                ctx.fillRect(20*piecePart, 20*piecePart, 20, 20)
+            }
+        } 
+    }
+}
+}
+
+
+drawMap();
+
+</script>
