@@ -1,0 +1,388 @@
+<meta name="color-scheme" content="dark">
+<!-- ADDING CANVAS-->
+<canvas id="canvas" width="540" height="540"></canvas>
+<button id="buttonUp">UP</button>
+<button id="buttonDown">DOWN</button>
+<button id="buttonLeft">LEFT</button>
+<button id="buttonRight">RIGHT</button>
+
+<script>
+
+//canvas STUFF
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext("2d");
+//variables used throughout
+var maploop = 0
+var x = 0
+var y = 0
+//player variables
+var playerpiece = 12
+var playerx = 2
+var playery = 3
+var playerHP = 10
+var playerDMG = 2
+//enemy variables
+//Buttons
+var buttonUp = document.getElementById("buttonUp")
+var buttonDown = document.getElementById("buttonDown")
+var buttonLeft = document.getElementById("buttonLeft")
+var buttonRight = document.getElementById("buttonRight")
+//adding eventlisteners to the buttons for when "wasd" is pressed 
+window.addEventListener("keyup", findButton)
+
+buttonUp.addEventListener("click", goUp)
+buttonDown.addEventListener("click", goDown)
+buttonLeft.addEventListener("click", goLeft)
+buttonRight.addEventListener("click", goRight)
+
+//Open
+//#region
+var piece00 = [
+      [true, true, true, true, true],
+      [true, true, true, true, true],
+      [true, true, true, true, true],
+      [true, true, true, true, true],
+      [true, true, true, true, true],
+]
+//plus shaped
+var piece01 = [
+      [false, false, true, false, false],
+      [false, false, true, false, false],
+      [true, true, true, true, true],
+      [false, false, true, false, false],
+      [false, false, true, false, false],
+]
+//column
+var piece02 = [
+      [false, false, true, false, false],
+      [false, false, true, false, false],
+      [false, false, true, false, false],
+      [false, false, true, false, false],
+      [false, false, true, false, false],
+]
+//line
+var piece03 = [
+      [false, false, false, false, false],
+      [false, false, false, false, false],
+      [true, true, true, true, true],
+      [false, false, false, false, false],
+      [false, false, false, false, false],
+]
+//Big O shape
+var piece04 = [
+      [true, true, true, true, true],
+      [true, false, false, false, true],
+      [true, false, false, false, true],
+      [true, false, false, false, true],
+      [true, true, true, true, true],
+]
+// little O shape v1
+var piece05 = [
+      [false, false, true, false, false],
+      [false, true, true, true, false],
+      [true, true, false, true, true],
+      [false, true, true, true, false],
+      [false, false, true, false, false],
+]
+//little O shape v2
+var piece06 = [
+      [false, false, true, false, false],
+      [false, true, true, true, false],
+      [true, true, true, true, true],
+      [false, true, true, true, false],
+      [false, false, true, false, false],
+]
+//corner line NORTH - EAST
+var piece07 = [
+      [false, false, true, true, true],
+      [false, false, false, false, true],
+      [false, false, false, false, true],
+      [false, false, false, false, false],
+      [false, false, false, false, false],
+]
+//corner line EAST - SOUTH
+var piece08 = [
+      [false, false, false, false, false],
+      [false, false, false, false, false],
+      [false, false, false, false, true],
+      [false, false, false, false, true],
+      [false, false, true, true, true],
+]
+//corner line SOUTH - WEST
+var piece09 = [
+      [false, false, false, false, false],
+      [false, false, false, false, false],
+      [true, false, false, false, false],
+      [true, false, false, false, false],
+      [true, true, true, false, false],
+]
+//corner line WEST - NORTH
+var piece10 = [
+      [true, true, true, false, false],
+      [true, false, false, false, false],
+      [true, false, false, false, false],
+      [false, false, false, false, false],
+      [false, false, false, false, false],
+]
+//corner line NORTH - South (east)
+var piece11 = [
+      [false, false, true, true, true],
+      [false, false, false, false, true],
+      [false, false, false, false, true],
+      [false, false, false, false, true],
+      [false, false, true, true, true],
+]
+//corner line NORTH - SOUTH (west)
+var piece12 = [
+      [true, true, true, false, false],
+      [true, false, false, false, false],
+      [true, false, false, false, false],
+      [true, false, false, false, false],
+      [true, true, true, false, false],
+]
+//corner line EAST - WEST (north)
+var piece13 = [
+      [true, true, true, true, true],
+      [true, false, false, false, true],
+      [true, false, false, false, true],
+      [false, false, false, false, false],
+      [false, false, false, false, false],
+]
+//corner line EAST - WEST (south)
+var piece14 = [
+      [false, false, false, false, false],
+      [false, false, false, false, false],
+      [true, false, false, false, true],
+      [true, false, false, false, true],
+      [true, true, true, true, true],
+]
+var piece15 = [
+      [false, true, true, true, false],
+      [false, true, true, true, false],
+      [false, true, true, true, false],
+      [false, true, true, true, false],
+      [false, true, true, true, false],
+]
+var piece16 = [
+      [false, false, false, false, false],
+      [true, true, true, true, true],
+      [true, true, true, true, true],
+      [true, true, true, true, true],
+      [false, false, false, false, false],
+]
+var piece17 = [
+      [false, true, true, true, false],
+      [true, true, true, true, true],
+      [true, true, true, true, true],
+      [true, true, true, true, true],
+      [false, true, true, true, false],
+]
+//#endregion
+
+//adding all pieces into an array
+var mapTiles = [piece00, piece01, piece04, piece05, piece06, piece17]
+//making the "map" for the pieces to be nested in
+var map = [
+      [], [], [], [], [], 
+      [], [], [], [], [],
+      [], [], [], [], [],
+      [], [], [], [], [],
+      [], [], [], [], [],
+]
+
+function fillMap () {
+for(maploop; maploop < 25; maploop++) {
+    //making a random number generator using the length of the map array
+    var mapTilesRandom = Math.random()
+    var mapTilesLength = mapTiles.length
+    var mapTilesOutput = Math.floor(mapTilesRandom*mapTilesLength)
+    //pushing "map pieces" into the map variable making it a nested array inside a nested array
+    var randomTile = mapTiles[mapTilesOutput]
+    map[maploop].push(randomTile)
+}
+}
+fillMap();
+
+//remember map[][0][][] to reach true/false state
+//map[which array of the map from 0-24]
+//map[][only one option, 0(only one option in my case)]
+//map[][][checking the arrays inside the maptile]
+//map[][][][checking values within said array(true/false)]
+
+
+//Making a function to draw the map using canvas
+function drawMap () {
+    //making a forloop that counts to 25 for the size of the map
+    // making map[X][][][] possible
+    // if (map[enemyRandomPiece][0][enemyRandomY][enemyRandomX] === true) {
+    //         ctx.fillStyle = "red"
+    //         ctx.fillRect(20*enemyRandomX+((enemyRandomPiece%5)*100)+3, 20*enemyRandomY+(enemyBy5*100)+3, 14, 14)
+
+            for (var xyz=0;xyz<map.length;xyz++) { 
+        //making a loop to run within the first forloop to run map[][][X][]
+        for (y=0;y<map[1][0].length;y++) {
+            //making yet another forloop to run map[][][][X]
+            for (x=0;x<map[1][0].length;x++) {
+                var num5 = Math.floor(xyz/5)
+                //Cannot read properties of undefined (reading '0') because of [0] OR any "nesting" beyond the first !!MAIN PROBLEM!!
+                if(map[xyz][0][y][x] == false) {
+                    //coloring walls blue temporarily to resemble water
+                    ctx.fillStyle = "blue"
+                    //coloring non-walls green temporarily to resemble grass
+                }else{
+                    ctx.fillStyle = "green"
+                        
+                    }
+                    ctx.fillRect(20*x+((xyz%5)*100), 20*y+(num5*100), 20, 20)
+                } 
+            }
+        }
+    }
+// }
+drawMap();
+
+function popMap() {
+    for (var pop = 0; pop < map.length; pop++) {
+        map[pop].pop()
+        
+    }
+}
+
+//making a function for the playable character
+function player() {
+ctx.fillStyle = "orange"
+var playerBy5 = Math.floor(playerpiece/5)
+ctx.fillRect(20*playerx+((playerpiece%5)*100)+3, 20*playery+(playerBy5*100)+3, 14, 14)
+}
+player()
+
+function findButton(button) {
+if (button.key == "w") {
+    goUp()
+}
+if (button.key == "s") {
+    goDown()
+}
+if (button.key == "a") {
+    goLeft()
+}
+if (button.key == "d") {
+    goRight()
+}
+}
+
+function goUp(){
+// along the lines of "if" map[][][][] "above" player == true... pop player... push player (to new tile)
+// if (map[playerpiece][0][playery-1][playerx] == true) {
+    // playery--
+// }
+if (playery == 0 && map[playerpiece - 5][0][4][playerx] == true) {
+        playerpiece-=5
+        playery = 4;
+    }
+else if (map[playerpiece][0][playery-1][playerx] == true) {
+   playery--
+}
+SpawnAll()
+}
+function goDown(){
+//-||- "below"
+if (playery == 4 && map[playerpiece + 5][0][0][playerx] == true) {
+        playerpiece+=5
+        playery = 0;
+    }
+else if (map[playerpiece][0][playery+1][playerx] == true) {
+   playery++
+}
+SpawnAll()
+}
+function goLeft(){
+//-||- "to the left"
+if (playerx == 0 && map[playerpiece - 1][0][playery][4] == true) {
+        playerpiece--
+        playerx = 4;
+    }
+else if (map[playerpiece][0][playery][playerx-1] == true) {
+   playerx--
+}
+SpawnAll()
+}
+function goRight(){
+//-||- "to the right"
+if (playerx == 4 && map[playerpiece + 1][0][playery][0] == true) {
+        playerpiece++
+        playerx = 0;
+      // if (map[playerpiece] == 6 || 11 || 16 || 21) {
+      //       return false;
+      // }
+    }
+else if (map[playerpiece][0][playery][playerx+1] == true) {
+   playerx++
+}
+SpawnAll()
+}
+
+// placeholder place for enemy variables
+var enemyMaxPiece = map.length
+var enemyMaxY = map[0][0][0].length
+var enemyMaxX = map[0][0][0].length
+var enemyByRandom = Math.random()
+var enemyBy5 = Math.floor(enemyMaxPiece*enemyByRandom/5)
+
+
+function spawnEnemy() {
+      var enemyRandom = Math.random()
+      var enemyRandom2 = Math.random()
+      var enemyRandomPiece = Math.floor(enemyRandom*enemyMaxPiece)
+      var enemyRandomX = Math.floor(enemyRandom*enemyMaxX)
+      var enemyRandomY = Math.floor(enemyRandom2*enemyMaxY)
+      if (map[enemyRandomPiece][0][enemyRandomY][enemyRandomX] === true) {
+            ctx.fillStyle = "red"
+            ctx.fillRect(20*enemyRandomX+((enemyRandomPiece%5)*100)+3, 20*enemyRandomY+(enemyBy5*100)+3, 14, 14)
+        }else{
+            spawnEnemy()
+            
+      }
+}
+spawnEnemy()
+
+
+//stars variables
+var stairsMaxPiece = map.length
+var stairsMaxY = map[0][0][0].length
+var stairsMaxX = map[0][0][0].length
+var stairsBy5 = Math.floor(stairsMaxPiece/5)
+var stairsByRandom = Math.random()
+var stairsBy5 = Math.floor(stairsMaxPiece*stairsByRandom/5)
+
+function spawnStairs() {
+      var stairsRandom = Math.random()
+      var stairsRandom2 = Math.random()
+      var stairsRandomPiece = Math.floor(stairsRandom*stairsMaxPiece)
+      var stairsRandomX = Math.floor(stairsRandom*stairsMaxX)
+      var stairsRandomY = Math.floor(stairsRandom2*stairsMaxY)
+      //maybe for loop? to fix issue with stairsBy5?
+      if (map[stairsRandomPiece][0][stairsRandomY][stairsRandomX] === true) {
+            ctx.fillStyle = "gray"
+            ctx.fillRect(20*stairsRandomX+((stairsRandomPiece%5)*100)+3, 20*stairsRandomY+(stairsBy5*100)+3, 14, 14)
+      }else{
+            spawnStairs()
+      }
+}
+spawnStairs()
+
+function SpawnAll() {
+    drawMap()
+    player()
+    spawnEnemy()
+    spawnStairs()
+}
+
+
+function newFloor() {
+    if (player == spawnStairs) {
+        fillMap
+        drawMap
+    }
+}
+</script>
